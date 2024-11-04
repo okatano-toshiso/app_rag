@@ -1,5 +1,5 @@
 from openai import OpenAI
-from utils.rag import gurmet_scrape_article, scrape_article, chunk_text, vectorize_text, find_most_similar, ask_question
+from utils.rag import tourism_scrape_article, gurmet_scrape_article, scrape_article, chunk_text, vectorize_text, find_most_similar, ask_question
 
 
 def get_chatgpt_response(api_key, model, temperature, system_content, user_message):
@@ -20,10 +20,13 @@ def get_chatgpt_response(api_key, model, temperature, system_content, user_messa
 
 
 def get_chatgpt_response_rag(user_message,urls, model, message_template, status):
+    print(model)
     chunk_size = 400
     overlap = 50
     if status == "gourmet":
         article_text = gurmet_scrape_article(urls)
+    if status == "tourism":
+        article_text = tourism_scrape_article(urls)
     else:
         article_text = scrape_article(urls)
     text_chunks = chunk_text(article_text, chunk_size, overlap)

@@ -21,7 +21,6 @@ def scrape_article(urls):
         soup = BeautifulSoup(response.text, "html.parser")
         text_nodes = soup.find_all("div")
         joined_text += "".join(t.text.replace("\t", "").replace("\n", "") for t in text_nodes)
-
     return joined_text
 
 def gurmet_scrape_article(urls):
@@ -35,8 +34,23 @@ def gurmet_scrape_article(urls):
             for t in text_nodes:
                 if "list-rst" not in t.get("class", []):
                     joined_text += t.text.replace("\t", "").replace("\n", "")
-
     return joined_text
+
+def tourism_scrape_article(urls):
+    joined_text = ""
+    for url in urls:
+        response = requests.get(url)
+        response.encoding = response.apparent_encoding  # 自動設定
+        soup = BeautifulSoup(response.text, "html.parser")
+        rank_list_div = soup.find("div", class_="rankList", id="rankList")
+        if rank_list_div:
+            text_nodes = rank_list_div.find_all("div")
+            for t in text_nodes:
+                if "item-relation-planlist" not in t.get("class", []):
+                    joined_text += t.text.replace("\t", "").replace("\n", "")
+    print("joined_text", joined_text)
+    return joined_text
+
 
 def chunk_text(text, chunk_size, overlap):
     chunks = []

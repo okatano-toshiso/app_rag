@@ -85,6 +85,9 @@ class InquiryReservationStatus(Enum):
 class GourmetReservationStatus(Enum):
     GOURMET_RESERVATION_MENU = ("GOURMET_RESERVATION_MENU", None)
 
+class TourismReservationStatus(Enum):
+    TOURISM_RESERVATION_MENU = ("TOURISM_RESERVATION_MENU", None)
+
 class ErrorReservationStatus(Enum):
     ERROR_RESERVATION_MENU = ("ERROR_RESERVATION_MENU", None)
 

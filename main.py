@@ -21,13 +21,15 @@ from reservation_status import (
     UpdateReservationStatus,
     ErrorReservationStatus,
     InquiryReservationStatus,
-    GourmetReservationStatus
+    GourmetReservationStatus,
+    TourismReservationStatus
 )
 from reservation_handler import ReservationHandler, ReservationStatus  # noqa: F811
 from reservation_handler_check import ReservationCheckHandler
 from reservation_handler_update import ReservationUpdateHandler
 from reservation_handler_inquiry import InquiryHandler
 from reservation_handler_gourmet import GourmetHandler
+from reservation_handler_tourism import TourismHandler
 
 from datetime import datetime, timedelta
 from utils.line_audio_save import AudioSaver, S3Storage, TmpStorage
@@ -105,6 +107,7 @@ def generate_response(
     )
     inquiry_handler = InquiryHandler(db_reserves_ref, OPENAI_API_KEY, MESSAGES)
     gourmet_handler = GourmetHandler(db_reserves_ref, OPENAI_API_KEY, MESSAGES)
+    tourism_handler = TourismHandler(db_reserves_ref, OPENAI_API_KEY, MESSAGES)
 
     if user_status_code == ReservationStatus.RESERVATION_MENU.name:
         USER_DEFAULT_PROMPT = MESSAGES[ReservationStatus.RESERVATION_MENU.name]
@@ -116,6 +119,7 @@ def generate_response(
         bot_response = get_chatgpt_response(
             OPENAI_API_KEY, "gpt-4o", 0, system_content, user_message
         )
+        print("bot_response", bot_response)
         if MenuItem.NEW_RESERVATION.code in bot_response:
             RESERVATION_RECEPTION_START = MESSAGES[
                 ReservationStatus.NEW_RESERVATION_START.name
@@ -164,6 +168,15 @@ def generate_response(
             GOURMET_START = message_template.format(**extra_datas)
             user_status_code = GourmetReservationStatus.GOURMET_RESERVATION_MENU.name
             return str(GOURMET_START), user_status_code
+        elif MenuItem.TOURISM.code in bot_response:
+            print(GourmetReservationStatus.GOURMET_RESERVATION_MENU.name)
+            extra_datas = {"title": "観光スポット情報"}
+            message_template = (
+                f"{MESSAGES[TourismReservationStatus.TOURISM_RESERVATION_MENU.name]}"
+            )
+            TOURISM_START = message_template.format(**extra_datas)
+            user_status_code = TourismReservationStatus.TOURISM_RESERVATION_MENU.name
+            return str(TOURISM_START), user_status_code
         else:
             ERROR_RESERVATION_MENU = MESSAGES[
                 ErrorReservationStatus.ERROR_RESERVATION_MENU.name
@@ -487,6 +500,17 @@ def generate_response(
             unique_code,
         )
 
+    if (
+        user_status_code
+        == TourismReservationStatus.TOURISM_RESERVATION_MENU.name
+    ):
+        return tourism_handler.handle_tourism_step(
+            TourismReservationStatus.TOURISM_RESERVATION_MENU,
+            user_message,
+            TourismReservationStatus.TOURISM_RESERVATION_MENU,
+            user_id,
+            unique_code,
+        )
 
 
 
