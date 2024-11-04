@@ -104,6 +104,7 @@ def generate_response(
         db_update_reserves_ref, OPENAI_API_KEY, MESSAGES
     )
     inquiry_handler = InquiryHandler(db_reserves_ref, OPENAI_API_KEY, MESSAGES)
+    gourmet_handler = GourmetHandler(db_reserves_ref, OPENAI_API_KEY, MESSAGES)
 
     if user_status_code == ReservationStatus.RESERVATION_MENU.name:
         USER_DEFAULT_PROMPT = MESSAGES[ReservationStatus.RESERVATION_MENU.name]

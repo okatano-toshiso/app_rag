@@ -24,6 +24,19 @@ def scrape_article(urls):
 
     return joined_text
 
+def gurmet_scrape_article(urls):
+    joined_text = ""
+    for url in urls:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, "html.parser")
+        main_div = soup.find("div", class_="flexible-rstlst-main")
+        if main_div:
+            text_nodes = main_div.find_all("div")
+            for t in text_nodes:
+                if "list-rst" not in t.get("class", []):
+                    joined_text += t.text.replace("\t", "").replace("\n", "")
+
+    return joined_text
 
 def chunk_text(text, chunk_size, overlap):
     chunks = []
@@ -60,17 +73,11 @@ def find_most_similar(question_vector, vectors, documents):
     return top_documents
 
 
-def ask_question(question, context):
-    prompt = f'''
-    下記の参考情報をもとにユーザーの質問に回答してください。
-    [ユーザーの質問]
-    {question}
-    [参考情報]
-    {context}
-    '''
+def ask_question(question, context, model, message_template):
+    prompt = message_template.format(question=question, context=context)
     response = client.chat.completions.create(
         # model="ft:gpt-3.5-turbo-0125:personal:inn-faq-v1:AOL3qfFi",
-        model="gpt-4o",
+        model=model,
         temperature=0,
         messages=[
             {"role": "system", "content": prompt},
