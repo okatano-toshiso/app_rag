@@ -133,3 +133,4 @@ AI: 浅草寺、東京スカイツリー、上野公園などがおすすめで�
 
 開発者: [Your Name]  
 連絡先: [your.email@example.com]
+cd
